@@ -1,0 +1,6 @@
+RedBlack - by Darren Struthers <dstruthers@gmail.com>
+
+This is a simple Haskell implementation of red-black trees
+<http://en.wikipedia.org/wiki/Red_black_tree>, intended as a learning
+exercise for the author. The code is available under the terms of the X11
+license. See LICENSE for more information.
