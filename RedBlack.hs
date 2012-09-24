@@ -38,23 +38,25 @@ balance (Node v _ l r, []) = (Node v Black l r, [])
 balance z@(n, (Path _ _ Black _):_) = z
 -- Case 3: parent and uncle are red. Paint them both black and paint 
 -- grandparent red. Then move focus to the grandparent and balance.
-balance z@(n, (Path pd pv Red po):(Path gd gv gc (Node uv Red ul ur)):path) =
-  case (pd, gd) of
-    (L, L) -> balance (Node gv Red (Node pv Black n po) (Node uv Black ul ur), path)
-    (L, R) -> balance (Node gv Red (Node uv Black ul ur) (Node pv Black n po), path)
-    (R, L) -> balance (Node gv Red (Node pv Black po n) (Node uv Black ul ur), path)
-    (R, R) -> balance (Node gv Red (Node uv Black ul ur) (Node pv Black po n), path)
+balance (n, (Path L pv Red po):(Path L gv gc (Node uv Red ul ur)):path) =
+    balance (Node gv Red (Node pv Black n po) (Node uv Black ul ur), path)
+balance (n, (Path L pv Red po):(Path R gv gc (Node uv Red ul ur)):path) =
+    balance (Node gv Red (Node uv Black ul ur) (Node pv Black n po), path)
+balance (n, (Path R pv Red po):(Path L gv gc (Node uv Red ul ur)):path) =
+    balance (Node gv Red (Node pv Black po n) (Node uv Black ul ur), path)
+balance (n, (Path R pv Red po):(Path R gv gc (Node uv Red ul ur)):path) =
+    balance (Node gv Red (Node uv Black ul ur) (Node pv Black po n), path)
 -- Case 4: parent is red, but uncle is black. Path to focus node is either L,R
 -- or R,L
-balance z@(Node nv nc nl nr, (Path R pv Red pl):(Path L gv gc u):path) =
+balance (Node nv nc nl nr, (Path R pv Red pl):(Path L gv gc u):path) =
   balance (Node pv Red pl nl, (Path L nv Red nr):(Path L gv gc u):path)
-balance z@(Node nv nc nl nr, (Path L pv Red pr):(Path R gv gc u):path) =
+balance (Node nv nc nl nr, (Path L pv Red pr):(Path R gv gc u):path) =
   balance (Node pv Red nr pr, (Path R nv Red nl):(Path R gv gc u):path)
 -- Case 5: parent is red, but uncle is black. Path to focus node is either L,L
 -- or R,R
-balance z@(Node nv nc nl nr, (Path L pv Red pr):(Path L gv gc u):path) =
+balance (Node nv nc nl nr, (Path L pv Red pr):(Path L gv gc u):path) =
   (Node nv nc nl nr, (Path L pv Black (Node gv Red pr u)):path)
-balance z@(Node nv nc nl nr, (Path R pv Red pl):(Path R gv gc u):path) =
+balance (Node nv nc nl nr, (Path R pv Red pl):(Path R gv gc u):path) =
   (Node nv nc nl nr, (Path R pv Black (Node gv Red u pl)):path)
        
 fromZipper :: RedBlackZipper a -> RedBlackTree a
@@ -68,3 +70,10 @@ fromList = foldr insert Empty
 depth :: RedBlackTree a -> Int
 depth Empty = 0
 depth (Node _ _ l r) = 1 + max (depth l) (depth r)
+
+test :: (Ord a) => a -> RedBlackTree a -> Int
+test _ Empty = 1
+test x (Node v _ l r)
+  | x < v  = 1 + test x l
+  | x == v = 1
+  | x > v  = 1 + test x r
