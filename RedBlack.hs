@@ -67,6 +67,10 @@ fromZipper (n, (Path R pv pc pl):path) = fromZipper (Node pv pc pl n, path)
 fromList :: (Ord a) => [a] -> RedBlackTree a
 fromList = foldr insert Empty
 
+toList :: RedBlackTree a -> [a]
+toList Empty = []
+toList (Node x _ l r) = toList l ++ [x] ++ toList r
+
 depth :: RedBlackTree a -> Int
 depth Empty = 0
 depth (Node _ _ l r) = 1 + max (depth l) (depth r)
